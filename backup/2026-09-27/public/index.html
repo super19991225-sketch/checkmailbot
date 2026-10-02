@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mail Check</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="atmosphere" aria-hidden="true"></div>
+    <main class="shell">
+      <header class="hero">
+        <p class="eyebrow">Wellfound-first recruiting inbox tool</p>
+        <h1 class="brand">Mail Check</h1>
+        <p class="lede">
+          Primary source: <strong>Wellfound</strong> (<code>talent@wellfound.com</code>).
+          Also scans LinkedIn &amp; direct apps — keep American / Canada / EU / Latina.
+        </p>
+        <div class="cta-row">
+          <label class="check run-opt" title="Scan the full inbox (not only last N)">
+            <input type="checkbox" id="runScanAll" checked />
+            Entire inbox
+          </label>
+          <label class="check run-opt" title="Only scan unread messages">
+            <input type="checkbox" id="runUnreadOnly" />
+            Unread only
+          </label>
+          <label class="check run-opt" title="Mark scanned application mail as read on the server (Thunderbird syncs this)">
+            <input type="checkbox" id="runMarkRead" checked />
+            Mark as read
+          </label>
+          <label class="check run-opt" title="American=red ($label1); Canada, EU & Latina=yellow ($label2) in Thunderbird">
+            <input type="checkbox" id="runTagMail" checked />
+            Tag in Thunderbird
+          </label>
+          <button type="button" class="btn primary" id="runBtn" disabled>
+            Run selected
+          </button>
+          <button type="button" class="btn ghost" id="refreshBtn">Refresh</button>
+        </div>
+        <p class="hint run-hint">
+          <strong>Wellfound is primary.</strong>
+          Tags write to IMAP ($label1 red / $label2 yellow) + star.
+          If Thunderbird still shows old unread/no tags: right-click <strong>Inbox → Properties → Repair Folder</strong>,
+          then turn on the <strong>Tags</strong> column (column picker).
+        </p>
+      </header>
+
+      <section class="workspace" aria-label="Mailboxes and scan">
+        <div class="pane accounts-pane">
+          <div class="pane-head">
+            <h2>Mailboxes</h2>
+            <button type="button" class="btn text" id="newAccountBtn">+ Add mail</button>
+          </div>
+          <ul class="account-list" id="accountList"></ul>
+          <p class="empty" id="emptyAccounts" hidden>No mailboxes yet. Add one to start.</p>
+        </div>
+
+        <div class="pane form-pane" id="formPane" hidden>
+          <div class="pane-head">
+            <h2 id="formTitle">Add mail</h2>
+            <button type="button" class="btn text" id="cancelFormBtn">Close</button>
+          </div>
+          <form id="accountForm" class="account-form" autocomplete="off">
+            <input type="hidden" id="accountId" />
+            <label>
+              Company name
+              <input id="companyName" name="companyName" placeholder="geniusxlab" required />
+            </label>
+            <label>
+              Email
+              <input id="email" name="email" type="email" placeholder="contact@company.com" required />
+            </label>
+            <label>
+              Password
+              <input
+                id="password"
+                name="password"
+                type="password"
+                placeholder="IMAP password"
+                autocomplete="new-password"
+              />
+              <span class="hint" id="passwordHint" hidden>Leave blank to keep current password</span>
+            </label>
+            <label>
+              Provider
+              <select id="provider" name="provider"></select>
+            </label>
+            <p class="hint" id="providerHint" hidden></p>
+            <label id="hostLabel">
+              IMAP host
+              <input id="host" name="host" placeholder="imap.example.com" />
+            </label>
+            <label id="portLabel" hidden>
+              IMAP port
+              <input id="port" name="port" type="number" min="1" max="65535" value="993" />
+              <span class="hint">Only needed for rare custom servers. Normal email uses 993.</span>
+            </label>
+            <div class="row-2">
+              <label class="check" title="Scan every message in the inbox">
+                <input id="formScanAll" name="formScanAll" type="checkbox" checked />
+                Entire inbox (recommended)
+              </label>
+              <label class="check">
+                <input id="unreadOnly" name="unreadOnly" type="checkbox" />
+                Default: unread only
+              </label>
+            </div>
+            <label id="scanLimitLabel">
+              Scan last N only (if Entire inbox is off)
+              <input id="scanLimit" name="scanLimit" type="number" min="0" max="100000" value="0" />
+              <span class="hint">0 = all mail. Leave Entire inbox on unless you need a smaller test run.</span>
+            </label>
+            <div class="form-actions">
+              <button type="button" class="btn ghost" id="testBtn">Check login</button>
+              <button type="submit" class="btn primary" id="saveBtn">Save mailbox</button>
+              <button type="button" class="btn danger text" id="deleteBtn" hidden>Delete</button>
+            </div>
+            <p class="form-error" id="formError" hidden></p>
+            <p class="form-ok" id="formOk" hidden></p>
+          </form>
+        </div>
+
+        <div class="pane run-pane">
+          <div class="pane-head">
+            <h2>Run log</h2>
+            <span class="status-pill" id="jobStatus">Idle</span>
+          </div>
+          <pre class="log" id="logView">Select mailboxes, then Run selected.</pre>
+          <div class="results" id="results"></div>
+          <div class="exports">
+            <h3>Recent exports</h3>
+            <ul id="exportList"></ul>
+          </div>
+        </div>
+      </section>
+    </main>
+    <script src="/app.js"></script>
+  </body>
+</html>

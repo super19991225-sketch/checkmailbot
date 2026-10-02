@@ -1,0 +1,26 @@
+{
+  "name": "check-mail",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Recruiting inbox checker — job-site location, Excel, Thunderbird tags, and Mail Check folders for any mail app",
+  "main": "electron/main.js",
+  "scripts": {
+    "start": "node index.js",
+    "ui": "node server.js",
+    "desktop": "electron .",
+    "app": "electron .",
+    "test:filter": "node scripts/test-filter.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.6.1",
+    "exceljs": "^4.4.0",
+    "express": "^5.1.0",
+    "google-auth-library": "^9.15.1",
+    "imapflow": "^2.0.5",
+    "mailparser": "^3.7.2",
+    "pdf-parse": "^2.4.5"
+  },
+  "devDependencies": {
+    "electron": "^44.4.5"
+  }
+}

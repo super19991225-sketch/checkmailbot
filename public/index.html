@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mail Check</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="atmosphere" aria-hidden="true"></div>
+    <main class="shell">
+      <header class="hero">
+        <p class="eyebrow">Recruiting inbox checker · full version</p>
+        <h1 class="brand">Mail Check</h1>
+        <p class="lede">
+          Checks Wellfound, Hubstaff, Sulekha, CazVid, GoHire, Indeed, LinkedIn, and forwarded job-site mail.
+          Keeps American, Canada, EU, and Latin America. The <strong>Job site</strong> cell records the platform.
+        </p>
+        <div class="cta-row">
+          <label class="check run-opt" title="Scan the full inbox (not only last N)">
+            <input type="checkbox" id="runScanAll" checked />
+            Entire inbox
+          </label>
+          <label class="check run-opt" title="Only scan unread messages">
+            <input type="checkbox" id="runUnreadOnly" />
+            Unread only
+          </label>
+          <label class="check run-opt" title="Mark scanned application mail as read on the server (Thunderbird syncs this)">
+            <input type="checkbox" id="runMarkRead" checked />
+            Mark as read
+          </label>
+          <label class="check run-opt" title="Thunderbird colors plus Mail Check folders so any mail app can see the same tags">
+            <input type="checkbox" id="runTagMail" checked />
+            Tag mail
+          </label>
+          <label class="check run-opt" title="Ignore the saved record and open every message again (slow). Normally only new mail is opened.">
+            <input type="checkbox" id="runRecheckAll" />
+            Re-check all (slow)
+          </label>
+          <button type="button" class="btn primary" id="runBtn" disabled>
+            Run selected
+          </button>
+          <button type="button" class="btn ghost" id="refreshBtn">Refresh</button>
+        </div>
+        <p class="hint run-hint">
+          <strong>Fast by default:</strong> messages already checked are remembered, so each run only opens new mail.
+          Tags: confirmed US = red, Canada/EU/Latina = yellow, weak location = a third tag in Thunderbird, plus a star.
+          The same mail is copied into <strong>Mail Check</strong> folders (American, Canada, European, Latina, Possible) so Outlook and other apps can open them.
+          Wellfound and other job-site applications (Hubstaff, Sulekha, CazVid, GoHire, Indeed, LinkedIn, and forwarded board mail) use the same location check: profile city and university only.
+          Those candidates land on the <strong>American</strong>, <strong>European</strong>, and <strong>Latina</strong> sheets. The <strong>Job site</strong> cell names the platform; Wellfound is gold.
+          Asian and African candidates from those platforms are rejected.
+          Possible means the profile city is only a continent or is missing, and the university does not confirm it.
+          If Thunderbird still shows old unread/no tags: right-click <strong>Inbox → Properties → Repair Folder</strong>,
+          then turn on the <strong>Tags</strong> column (column picker).
+        </p>
+      </header>
+
+      <section class="workspace" aria-label="Mailboxes and scan">
+        <div class="pane accounts-pane">
+          <div class="pane-head">
+            <h2>Mailboxes</h2>
+            <button type="button" class="btn text" id="newAccountBtn">+ Add mail</button>
+          </div>
+          <ul class="account-list" id="accountList"></ul>
+          <p class="empty" id="emptyAccounts" hidden>No mailboxes yet. Add one to start.</p>
+        </div>
+
+        <div class="pane form-pane" id="formPane" hidden>
+          <div class="pane-head">
+            <h2 id="formTitle">Add mail</h2>
+            <button type="button" class="btn text" id="cancelFormBtn">Close</button>
+          </div>
+          <form id="accountForm" class="account-form" autocomplete="off">
+            <input type="hidden" id="accountId" />
+            <label>
+              Company name
+              <input id="companyName" name="companyName" placeholder="geniusxlab" required />
+            </label>
+            <label>
+              Email
+              <input id="email" name="email" type="email" placeholder="contact@company.com" required />
+            </label>
+            <label>
+              Password
+              <input
+                id="password"
+                name="password"
+                type="password"
+                placeholder="IMAP password"
+                autocomplete="new-password"
+              />
+              <span class="hint" id="passwordHint" hidden>Leave blank to keep current password</span>
+            </label>
+            <label>
+              Provider
+              <select id="provider" name="provider"></select>
+            </label>
+            <p class="hint" id="providerHint" hidden></p>
+            <label id="hostLabel">
+              IMAP host
+              <input id="host" name="host" placeholder="imap.example.com" />
+            </label>
+            <label id="portLabel" hidden>
+              IMAP port
+              <input id="port" name="port" type="number" min="1" max="65535" value="993" />
+              <span class="hint">Only needed for rare custom servers. Normal email uses 993.</span>
+            </label>
+            <div class="row-2">
+              <label class="check" title="Scan every message in the inbox">
+                <input id="formScanAll" name="formScanAll" type="checkbox" checked />
+                Entire inbox (recommended)
+              </label>
+              <label class="check">
+                <input id="unreadOnly" name="unreadOnly" type="checkbox" />
+                Default: unread only
+              </label>
+            </div>
+            <label id="scanLimitLabel">
+              Scan last N only (if Entire inbox is off)
+              <input id="scanLimit" name="scanLimit" type="number" min="0" max="100000" value="0" />
+              <span class="hint">0 = all mail. Leave Entire inbox on unless you need a smaller test run.</span>
+            </label>
+            <label>
+              Google Sheet URL (optional)
+              <input id="sheetId" name="sheetId" placeholder="https://docs.google.com/spreadsheets/d/…" />
+              <span class="hint">Kept candidates are written to American / Canada / European / Latina tabs after each run.</span>
+            </label>
+            <div class="form-actions">
+              <button type="button" class="btn ghost" id="testBtn">Check login</button>
+              <button type="submit" class="btn primary" id="saveBtn">Save mailbox</button>
+              <button type="button" class="btn danger text" id="deleteBtn" hidden>Delete</button>
+            </div>
+            <p class="form-error" id="formError" hidden></p>
+            <p class="form-ok" id="formOk" hidden></p>
+          </form>
+        </div>
+
+        <div class="pane run-pane">
+          <div class="pane-head">
+            <h2>Run log</h2>
+            <span class="status-pill" id="jobStatus">Idle</span>
+          </div>
+          <pre class="log" id="logView">Select mailboxes, then Run selected.</pre>
+          <div class="results" id="results"></div>
+          <div class="exports">
+            <h3>Recent exports</h3>
+            <ul id="exportList"></ul>
+          </div>
+          <div class="exports google-box">
+            <h3>Google Sheets</h3>
+            <p class="hint" id="googleStatus">Checking…</p>
+            <details id="googleSetup">
+              <summary>Set up / change service account key</summary>
+              <ol class="hint">
+                <li>Google Cloud console → enable <strong>Google Sheets API</strong>.</li>
+                <li>Create a <strong>service account</strong> → Keys → Add key → JSON.</li>
+                <li>Paste the whole JSON file below and save.</li>
+                <li>Share each Google Sheet with the service account email as <strong>Editor</strong>.</li>
+              </ol>
+              <textarea id="googleKey" rows="5" placeholder='{"type": "service_account", ...}'></textarea>
+              <div class="form-actions">
+                <button type="button" class="btn primary" id="googleSaveBtn">Save key</button>
+                <button type="button" class="btn danger text" id="googleRemoveBtn">Remove key</button>
+              </div>
+              <p class="form-error" id="googleError" hidden></p>
+            </details>
+          </div>
+        </div>
+      </section>
+    </main>
+    <script src="/app.js"></script>
+  </body>
+</html>
